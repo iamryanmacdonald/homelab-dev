@@ -1,10 +1,22 @@
 argocd:
   global:
     domain: argocd.127-0-0-1.nip.io
+  configs:
+    params:
+      server.insecure: true
+      controller.diff.server.side: true
+    cm:
+      resource.ignoreResourceUpdatesEnabled: true
+      resource.customizations.ignoreResourceUpdates.all: |
+        jsonPointers:
+          - /status
   server:
     ingress:
       enabled: true
       ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls: true
     metrics: &metrics
       enabled: true
       serviceMonitor:
@@ -44,6 +56,7 @@ argocd-apps:
               prune: true
               selfHeal: true
             retry:
+              limit: 10
               backoff:
                 duration: 1m
                 factor: 2
