@@ -8,3 +8,4 @@
         state: present
       loop:
         - cert-manager
+        - global-secrets
