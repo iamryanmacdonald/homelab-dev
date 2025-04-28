@@ -1,0 +1,32 @@
+argocd:
+  global:
+    domain: argocd.127-0-0-1.nip.io
+  server:
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+argocd-apps:
+  applicationsets:
+    root:
+      namespace: argocd
+      template:
+        metadata:
+          name: '{{ path.basename }}'
+        spec:
+          destination:
+            name: in-cluster
+            namespace: '{{ path.basename }}'
+          project: default # TODO
+          syncPolicy:
+            automated:
+              prune: true
+              selfHeal: true
+            retry:
+              backoff:
+                duration: 1m
+                factor: 2
+                maxDuration: 16m
+            syncOptions:
+              - ApplyOutOfSyncOnly=true
+              - CreateNamespace=true
+              - ServerSideApply=true
