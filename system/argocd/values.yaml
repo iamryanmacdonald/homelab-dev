@@ -5,10 +5,28 @@ argocd:
     ingress:
       enabled: true
       ingressClassName: nginx
+    metrics: &metrics
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  controller:
+    metrics: *metrics
+  redis:
+    metrics: *metrics
+  repoServer:
+    metrics: *metrics 
 argocd-apps:
   applicationsets:
     root:
       namespace: argocd
+      generators:
+        - git:
+            repoURL: &repoURL https://github.com/iamryanmacdonald/homelab-dev
+            revision: &revision main
+            directories:
+              - path: system/*
+              - path: platform/*
+              - path: apps/*
       template:
         metadata:
           name: '{{ path.basename }}'
@@ -17,6 +35,10 @@ argocd-apps:
             name: in-cluster
             namespace: '{{ path.basename }}'
           project: default # TODO
+          source:
+            repoURL: *repoURL
+            path: '{{ path }}'
+            targetRevision: *revision
           syncPolicy:
             automated:
               prune: true

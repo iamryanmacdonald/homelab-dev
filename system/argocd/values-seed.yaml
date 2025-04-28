@@ -1,3 +1,15 @@
+argocd:
+  server:
+    metrics: &metrics
+      enabled: false
+      serviceMonitor:
+        enabled: false
+  controller:
+    metrics: *metrics
+  redis:
+    metrics: *metrics
+  repoServer:
+    metrics: *metrics
 argocd-apps:
   applicationsets:
     root:
